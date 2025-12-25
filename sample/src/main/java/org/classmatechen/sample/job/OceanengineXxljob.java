@@ -260,17 +260,24 @@ public class OceanengineXxljob {
     private LogSearchGetSampler logSearchGetSampler;
 
     /**
-     *  拉取昨天的日志 Delete And Insert
+     *  拉取指定日期的日志 Delete And Insert, 默认 昨天
      */
     @XxlJob("logSearchGetSampler")
     public void logSearchGetSampler() {
 
+        String day = XxlJobHelper.getJobParam();
+        if (null == day || day.length() == 0) {
+            day = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
+        }
+        final String date = day;
+        XxlJobHelper.log("date:" + date);
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<LogSearchGetSampler.Inner>> params = advertisers
             .stream()
             .map(advertiser -> {
                 LogSearchGetSampler.Inner param = new LogSearchGetSampler.Inner();
                 param.setAdvertiserId(advertiser.getAdvertiserId());
+                param.setDay(date);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
             })
             .collect(Collectors.toList());;
@@ -493,7 +500,7 @@ public class OceanengineXxljob {
     private ReportCustomGetGetSampler reportCustomGetGetSampler;
 
     /**
-     * 拉取昨天创意指标 Upsert
+     * 拉取指定日期范围的创意指标(默认昨天) Upsert
      */
     @XxlJob("reportCustomGetGetSampler")
     public void reportCustomGetGetSampler() {

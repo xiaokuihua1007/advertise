@@ -27,6 +27,6 @@ public class SamplerUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return new RequestBuilder<>(request).limit().retry().page().build();
+        return new RequestBuilder<>(request).limit(750).retry().page().build();
     }
 }

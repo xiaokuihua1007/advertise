@@ -1,6 +1,5 @@
 package org.classmatechen.sample.sample.oceanengine;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,9 +30,11 @@ public class LogSearchGetSampler implements Sampler<LogSearchGetSampler.Inner> {
     @Override
     public void sample(List<Param<Inner>> params) {
 
-        String yesterday = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
-        String startTime = yesterday + " 00:00:00";
-        String endTime = yesterday + " 23:59:59";
+        if (null == params || params.isEmpty()) {
+            return;
+        }
+        String day = params.get(0).getParam().getDay();
+        String startTime = day + " 00:00:00", endTime = day + " 23:59:59";
 
         List<Param<LogSearchGet.Param>> ps = params.stream().map(param -> {
             LogSearchGet.Param p = new LogSearchGet.Param();
@@ -56,5 +57,6 @@ public class LogSearchGetSampler implements Sampler<LogSearchGetSampler.Inner> {
     @Data
     public static class Inner {
         private Long advertiserId;
+        private String day;
     }
 }
