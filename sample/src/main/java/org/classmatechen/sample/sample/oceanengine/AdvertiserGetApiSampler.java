@@ -32,8 +32,6 @@ public class AdvertiserGetApiSampler implements Sampler<String> {
                 .stream()
                 .map(data -> new MongoRowBuilder<>(data)
                                             .removeNull()
-                                            .removeEmpty()
-                                            .removeBlank()
                                             .id(data.getAdvertiserId())
                                             .append("appId", ((DyContext) context).getAppId())
                                             .build()

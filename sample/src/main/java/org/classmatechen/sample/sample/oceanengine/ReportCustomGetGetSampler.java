@@ -1,5 +1,6 @@
 package org.classmatechen.sample.sample.oceanengine;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -8,21 +9,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bson.Document;
 import org.classmatechen.basic.group.Consumer;
 import org.classmatechen.basic.group.Param;
 import org.classmatechen.basic.group.impl.PageGroup;
 import org.classmatechen.oceanengine.request.ReportCustomGetGet;
-import org.classmatechen.sample.mongo.MongoRowBuilder;
-import org.classmatechen.sample.mongo.MongoStore;
+import org.classmatechen.sample.po.AdvertiseMetrics;
 import org.classmatechen.sample.sample.Sampler;
 import org.classmatechen.sample.sample.SamplerUtil;
+import org.classmatechen.sample.service.AdvertiseMetricsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bytedance.ads.model.ReportCustomGetV30DataTopic;
 import com.bytedance.ads.model.ReportCustomGetV30ResponseDataRowsInner;
-import com.mongodb.client.model.UpdateOneModel;
-
 import lombok.Data;
 
 /**
@@ -31,7 +30,8 @@ import lombok.Data;
 @Service
 public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSampler.SamplerParam> {
 
-    public static final String collection = "Dy_ReportCustomGetGet";
+    @Autowired
+    private AdvertiseMetricsService advertiseMetricsService;
 
     @Override
     public void sample(List<Param<ReportCustomGetGetSampler.SamplerParam>> sParams) {
@@ -40,9 +40,10 @@ public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSamp
         
         Consumer<ReportCustomGetGet.Param, List<ReportCustomGetV30ResponseDataRowsInner>> consumer = (context, param, list) -> {
 
-            List<UpdateOneModel<Document>> documents = list
-                    .stream()
-                    .map(data -> {
+            List<AdvertiseMetrics> metrics = list
+                .stream()
+                .map(data -> {
+                        String promotion_id = data.getDimensions().get("cdp_promotion_id");
                         String time = data.getDimensions().get("stat_time_hour");
                         Date date = null;
                         try {
@@ -52,35 +53,35 @@ public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSamp
                         }
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(date);
-                        String promotion_id = data.getDimensions().get("cdp_promotion_id");
-                        String shortTime = Long.toString((calendar.getTimeInMillis() / 1000));
-                        return new MongoRowBuilder<>()
-                                                .id(promotion_id + shortTime)
-                                                .append("promotion_id", promotion_id)
-                                                .append("year", calendar.get(Calendar.YEAR))
-                                                .append("month", calendar.get(Calendar.MONTH) + 1)
-                                                .append("day", calendar.get(Calendar.DAY_OF_MONTH))
-                                                .append("hour", calendar.get(Calendar.HOUR_OF_DAY))
-                                                .append("time", shortTime)
-                                                .append("stat_cost", data.getMetrics().get("stat_cost"))
-                                                .append("show_cnt", data.getMetrics().get("show_cnt"))
-                                                .append("cpm_platform", data.getMetrics().get("cpm_platform"))
-                                                .append("click_cnt", data.getMetrics().get("click_cnt"))
-                                                .append("cpc_platform", data.getMetrics().get("cpc_platform"))
-                                                .append("ctr", data.getMetrics().get("ctr"))
-                                                .append("attribution_convert_cnt", data.getMetrics().get("attribution_convert_cnt"))
-                                                .append("attribution_convert_cost", data.getMetrics().get("attribution_convert_cost"))
-                                                .append("convert_cnt", data.getMetrics().get("convert_cnt"))
-                                                .append("conversion_cost", data.getMetrics().get("conversion_cost"))
-                                                .append("conversion_rate", data.getMetrics().get("conversion_rate"))
-                                                .append("active", data.getMetrics().get("active"))
-                                                .append("active_cost", data.getMetrics().get("active_cost"))
-                                                .append("active_rate", data.getMetrics().get("active_rate"))
-                                                .build();
-                        }
-                    )
-                    .collect(Collectors.toList());
-                MongoStore.store(collection, documents);
+                        // String shortTime = Long.toString((calendar.getTimeInMillis() / 1000));
+
+                        AdvertiseMetrics metric = new AdvertiseMetrics();
+                        metric.setAdvertiseId(Long.parseLong(promotion_id));
+                        // metric.setTime(Long.parseLong(shortTime));
+                        metric.setHumanTime(calendar.getTime());
+                        // metric.setYear(calendar.get(Calendar.YEAR));
+                        // metric.setMonth(calendar.get(Calendar.MONTH) + 1);
+                        // metric.setDay(calendar.get(Calendar.DAY_OF_MONTH));
+                        // metric.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+                        metric.setStatCost(new BigDecimal(data.getMetrics().get("stat_cost")));
+                        metric.setShowCnt(Long.parseLong(data.getMetrics().get("show_cnt")));
+                        metric.setCpmPlatform(new BigDecimal(data.getMetrics().get("cpm_platform")));
+                        metric.setClickCnt(Long.parseLong(data.getMetrics().get("click_cnt")));
+                        metric.setCpcPlatform(new BigDecimal(data.getMetrics().get("cpc_platform")));
+                        metric.setCtr(new BigDecimal(data.getMetrics().get("ctr")));
+                        metric.setAttributionConvertCnt(Long.parseLong(data.getMetrics().get("attribution_convert_cnt")));
+                        metric.setAttributionConvertCost(new BigDecimal(data.getMetrics().get("attribution_convert_cost")));
+                        metric.setConvertCnt(Long.parseLong(data.getMetrics().get("convert_cnt")));
+                        metric.setConversionCost(new BigDecimal(data.getMetrics().get("conversion_cost")));
+                        metric.setConversionRate(new BigDecimal(data.getMetrics().get("conversion_rate")));
+                        metric.setActive(Long.parseLong(data.getMetrics().get("active")));
+                        metric.setActiveCost(new BigDecimal(data.getMetrics().get("active_cost")));
+                        metric.setActiveRate(new BigDecimal(data.getMetrics().get("active_rate")));
+                        return metric; 
+                    }
+                )
+                .collect(Collectors.toList());
+            advertiseMetricsService.insert(metrics);
         };
 
         new PageGroup<>(SamplerUtil.page(ReportCustomGetGet.class), params, consumer).execute();
@@ -116,6 +117,7 @@ public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSamp
         param.setStartTime(samplerParam.getStartTime());
         param.setEndTime(samplerParam.getEndTime());
         param.setOrderBy(Arrays.asList());
+        param.setPageSize(50L);
         return new Param<>(sParam.getContext(), param);
     }
 

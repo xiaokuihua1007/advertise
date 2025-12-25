@@ -1,4 +1,4 @@
-package org.classmatechen.sample.mapper;
+package org.classmatechen.sample.po;
 
 import lombok.Data;
 

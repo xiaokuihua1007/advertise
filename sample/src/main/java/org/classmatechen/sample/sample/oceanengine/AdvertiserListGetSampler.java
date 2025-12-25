@@ -31,8 +31,6 @@ public class AdvertiserListGetSampler implements Sampler<AdvertiserListGet.Param
                     .stream()
                     .map(data -> new MongoRowBuilder<>(data)
                                                 .removeNull()
-                                                .removeEmpty()
-                                                .removeBlank()
                                                 .id(data.getAdvertiserId())
                                                 .append("ccAccountId", param.getCcAccountId())
                                                 .append("appId", ((DyContext) context).getAppId())

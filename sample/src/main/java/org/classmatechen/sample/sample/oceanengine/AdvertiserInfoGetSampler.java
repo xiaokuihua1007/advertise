@@ -31,8 +31,6 @@ public class AdvertiserInfoGetSampler implements Sampler<AdvertiserInfoGet.Param
                     .stream()
                     .map(data -> new MongoRowBuilder<>(data)
                                                 .removeNull()
-                                                .removeEmpty()
-                                                .removeBlank()
                                                 .id(data.getId())
                                                 .append("appId", ((DyContext) context).getAppId())
                                                 .build()

@@ -29,9 +29,7 @@ public class FileVideoGetGetSampler implements Sampler<FileVideoGetGet.Param> {
             List<UpdateOneModel<Document>> documents = list
                     .stream()
                     .map(data -> new MongoRowBuilder<>(data)
-                                                // .removeNull()
-                                                // .removeEmpty()
-                                                // .removeBlank()
+                                                .removeNull()
                                                 .id(data.getId())
                                                 // .append("appId", ((DyContext) context).getAppId())
                                                 .build()

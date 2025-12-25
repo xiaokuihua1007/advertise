@@ -30,9 +30,7 @@ public class ProjectListGetSampler implements Sampler<ProjectListGet.Param> {
             List<UpdateOneModel<Document>> documents = list
                     .stream()
                     .map(data -> new MongoRowBuilder<>(data)
-                                                // .removeNull()
-                                                // .removeEmpty()
-                                                // .removeBlank()
+                                                .removeNull()
                                                 .id(data.getProjectId())
                                                 .append("appId", ((DyContext) context).getAppId())
                                                 .build()

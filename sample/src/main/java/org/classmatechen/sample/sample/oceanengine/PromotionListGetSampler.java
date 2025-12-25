@@ -30,9 +30,7 @@ public class PromotionListGetSampler implements Sampler<PromotionListGet.Param> 
             List<UpdateOneModel<Document>> documents = list
                     .stream()
                     .map(data -> new MongoRowBuilder<>(data)
-                                                // .removeNull()
-                                                // .removeEmpty()
-                                                // .removeBlank()
+                                                .removeNull()
                                                 .id(data.getPromotionId())
                                                 .append("appId", ((DyContext) context).getAppId())
                                                 .build()

@@ -1,52 +1,60 @@
 package org.classmatechen.sample.sample.oceanengine;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bson.Document;
 import org.classmatechen.basic.group.Consumer;
 import org.classmatechen.basic.group.Param;
 import org.classmatechen.basic.group.impl.PageGroup;
 import org.classmatechen.oceanengine.request.LogSearchGet;
-import org.classmatechen.sample.mongo.MongoRowBuilder;
-import org.classmatechen.sample.mongo.MongoStore;
 import org.classmatechen.sample.sample.Sampler;
 import org.classmatechen.sample.sample.SamplerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.bytedance.ads.model.ToolsLogSearchV2ResponseDataLogsInner;
-import com.mongodb.client.model.UpdateOneModel;
+
+import lombok.Data;
 
 @Service
-public class LogSearchGetSampler implements Sampler<LogSearchGet.Param> {
+public class LogSearchGetSampler implements Sampler<LogSearchGetSampler.Inner> {
 
     public static final String collection = "Dy_LogSearchGet";
 
+    @Autowired
+    private MongoTemplate template;
+
     @Override
-    public void sample(List<Param<LogSearchGet.Param>> params) {
- 
+    public void sample(List<Param<Inner>> params) {
+
+        String yesterday = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
+        String startTime = yesterday + " 00:00:00";
+        String endTime = yesterday + " 23:59:59";
+
+        List<Param<LogSearchGet.Param>> ps = params.stream().map(param -> {
+            LogSearchGet.Param p = new LogSearchGet.Param();
+            p.setStartTime(startTime);
+            p.setEndTime(endTime);
+            p.setPageSize(20L);
+            p.setAdvertiserId(param.getParam().getAdvertiserId());
+            return new Param<>(param.getContext(), p);
+        }).collect(Collectors.toList());
+
+        Query query = new Query(Criteria.where("createTime").gte(startTime).lt(endTime));
+        /** long count = */ this.template.remove(query, collection).getDeletedCount();
         Consumer<LogSearchGet.Param, List<ToolsLogSearchV2ResponseDataLogsInner>> consumer = (context, param, list) -> {
-            List<UpdateOneModel<Document>> documents = list
-                    .stream()
-                    .map(data -> {
-                        String id = new StringBuilder()
-                            .append(Long.toString(param.getAdvertiserId()))
-                            .append("-")
-                            .append(data.getCreateTime().replaceAll("-", "").replaceAll(":", "").replaceAll(" ", ""))
-                            .append("-")
-                            .append(data.getOperator())
-                            .append("-")
-                            .append(Long.toString(data.getObjectId()))
-                            .toString();
-                        return new MongoRowBuilder<>(data)
-                                                .id(id)
-                                                .append("advertiserId", param.getAdvertiserId())
-                                                .build();
-                    })
-                    .collect(Collectors.toList());
-                MongoStore.store(collection, documents);
+            this.template.insert(list, collection);
         };
 
-        new PageGroup<>(SamplerUtil.page(LogSearchGet.class), params, consumer).execute();
+        new PageGroup<>(SamplerUtil.page(LogSearchGet.class), ps, consumer).execute();
+    }
+
+    @Data
+    public static class Inner {
+        private Long advertiserId;
     }
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.classmatechen.sample.mapper.AdvertiseMetricsMapper">
+
+    <select id="list">
+        select * from oceanengine_advertise_metrics
+    </select>
+
+    <insert id="insert">
+        insert into oceanengine_advertise_metrics (
+            advertise_id,
+            human_time,
+            stat_cost,
+            show_cnt,
+            cpm_platform,
+            click_cnt,
+            cpc_platform,
+            ctr,
+            attribution_convert_cnt,
+            attribution_convert_cost,
+            convert_cnt,
+            conversion_cost,
+            conversion_rate,
+            active,
+            active_cost,
+            active_rate
+        ) values
+            <foreach collection="list" item="item" separator=",">
+            (
+                #{ item.advertiseId },
+                #{ item.humanTime },
+                #{ item.statCost },
+                #{ item.showCnt },
+                #{ item.cpmPlatform },
+                #{ item.clickCnt },
+                #{ item.cpcPlatform },
+                #{ item.ctr },
+                #{ item.attributionConvertCnt },
+                #{ item.attributionConvertCost },
+                #{ item.convertCnt },
+                #{ item.conversionCost },
+                #{ item.conversionRate },
+                #{ item.active },
+                #{ item.activeCost },
+                #{ item.activeRate }
+            )
+            </foreach>
+    </insert>
+</mapper>
