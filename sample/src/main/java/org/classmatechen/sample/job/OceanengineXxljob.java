@@ -498,13 +498,30 @@ public class OceanengineXxljob {
     @XxlJob("reportCustomGetGetSampler")
     public void reportCustomGetGetSampler() {
 
+        String range = XxlJobHelper.getJobParam();
+        String start = null, end = null;
+        if (null != range && range.length() > 0) {
+            String[] ranges = range.split("~");
+            if (ranges.length == 2) {
+                start = ranges[0];
+                end = ranges[1];
+            }
+        }
+        if (null == start || null == end) {
+            start = yesterdayStartTime();
+            end = yesterdayEndTime();
+        }
+
+        final String startTime = start, endTime = end;
+        XxlJobHelper.log("时间:" + startTime + " ~ " + endTime);
+
         List<Param<ReportCustomGetGetSampler.SamplerParam>> params = getAdvertisers()
             .stream()
             .map(advertiser -> {
                 ReportCustomGetGetSampler.SamplerParam param = new ReportCustomGetGetSampler.SamplerParam();
                 param.setAdvertiserId(advertiser.getAdvertiserId());
-                param.setStartTime(yesterdayStartTime());
-                param.setEndTime(yesterdayEndTime());
+                param.setStartTime(startTime);
+                param.setEndTime(endTime);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
             })
             .collect(Collectors.toList());
