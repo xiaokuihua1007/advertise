@@ -10,11 +10,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.classmatechen.basic.group.Consumer;
+import org.classmatechen.basic.group.GroupFail;
 import org.classmatechen.basic.group.Param;
 import org.classmatechen.basic.group.impl.PageGroup;
 import org.classmatechen.oceanengine.request.ReportCustomGetGet;
 import org.classmatechen.sample.po.AdvertiseMetrics;
-import org.classmatechen.sample.sample.Sampler;
+import org.classmatechen.sample.sample.AbstarctSampler;
 import org.classmatechen.sample.sample.SamplerUtil;
 import org.classmatechen.sample.service.AdvertiseMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,13 @@ import lombok.Data;
  * 统计当天每个小时每个广告的指标
  */
 @Service
-public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSampler.SamplerParam> {
+public class ReportCustomGetGetSampler extends AbstarctSampler<ReportCustomGetGetSampler.Inner> {
 
     @Autowired
     private AdvertiseMetricsService advertiseMetricsService;
 
     @Override
-    public void sample(List<Param<ReportCustomGetGetSampler.SamplerParam>> sParams) {
+    public List<GroupFail<ReportCustomGetGetSampler.Inner>> doSample(List<Param<ReportCustomGetGetSampler.Inner>> sParams) {
 
         List<Param<ReportCustomGetGet.Param>> params = sParams.stream().map(param -> param(param)).collect(Collectors.toList());
         
@@ -84,14 +85,26 @@ public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSamp
             advertiseMetricsService.insert(metrics);
         };
 
-        new PageGroup<>(SamplerUtil.page(ReportCustomGetGet.class), params, consumer).execute();
+        List<GroupFail<ReportCustomGetGet.Param>> fail = new PageGroup<>(SamplerUtil.page(ReportCustomGetGet.class), params, consumer).execute();
+        if (null != fail) {
+            return fail.stream().map(item -> {
+                ReportCustomGetGet.Param param = item.getParam();
+                Inner inner = new Inner();
+                inner.setAdvertiserId(param.getAdvertiserId());
+                inner.setStartTime(param.getStartTime());
+                inner.setEndTime(param.getEndTime());
+                return new GroupFail<>(new Param<>(item.getContext(), inner), item.getError());
+            }).collect(Collectors.toList());
+        } {
+            return null;
+        }
     }
 
-    private Param<ReportCustomGetGet.Param> param(Param<SamplerParam> sParam) {
+    private Param<ReportCustomGetGet.Param> param(Param<Inner> sParam) {
 
-        SamplerParam samplerParam = sParam.getParam();
+        Inner inner = sParam.getParam();
         ReportCustomGetGet.Param param = new ReportCustomGetGet.Param();
-        param.setAdvertiserId(samplerParam.getAdvertiserId());
+        param.setAdvertiserId(inner.getAdvertiserId());
         param.setDataTopic(ReportCustomGetV30DataTopic.BASIC_DATA);
         param.setDimensions(Arrays.asList(
             "stat_time_hour",
@@ -114,15 +127,15 @@ public class ReportCustomGetGetSampler implements Sampler<ReportCustomGetGetSamp
             "active_rate" // 激活率,计算方式：激活数/点击数*100%
         ));
         param.setFilters(Arrays.asList());
-        param.setStartTime(samplerParam.getStartTime());
-        param.setEndTime(samplerParam.getEndTime());
+        param.setStartTime(inner.getStartTime());
+        param.setEndTime(inner.getEndTime());
         param.setOrderBy(Arrays.asList());
         param.setPageSize(50L);
         return new Param<>(sParam.getContext(), param);
     }
 
     @Data
-    public static class SamplerParam {
+    public static class Inner {
     
         private Long advertiserId;
         private String startTime;

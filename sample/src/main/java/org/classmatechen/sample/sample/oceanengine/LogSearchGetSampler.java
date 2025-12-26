@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.classmatechen.basic.group.Consumer;
+import org.classmatechen.basic.group.GroupFail;
 import org.classmatechen.basic.group.Param;
 import org.classmatechen.basic.group.impl.PageGroup;
 import org.classmatechen.oceanengine.request.LogSearchGet;
-import org.classmatechen.sample.sample.Sampler;
+import org.classmatechen.sample.sample.AbstarctSampler;
 import org.classmatechen.sample.sample.SamplerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,7 +21,7 @@ import com.bytedance.ads.model.ToolsLogSearchV2ResponseDataLogsInner;
 import lombok.Data;
 
 @Service
-public class LogSearchGetSampler implements Sampler<LogSearchGetSampler.Inner> {
+public class LogSearchGetSampler extends AbstarctSampler<LogSearchGetSampler.Inner> {
 
     public static final String collection = "Dy_LogSearchGet";
 
@@ -28,10 +29,10 @@ public class LogSearchGetSampler implements Sampler<LogSearchGetSampler.Inner> {
     private MongoTemplate template;
 
     @Override
-    public void sample(List<Param<Inner>> params) {
+    public List<GroupFail<Inner>> doSample(List<Param<Inner>> params) {
 
         if (null == params || params.isEmpty()) {
-            return;
+            return null;
         }
         String day = params.get(0).getParam().getDay();
         String startTime = day + " 00:00:00", endTime = day + " 23:59:59";
@@ -51,7 +52,18 @@ public class LogSearchGetSampler implements Sampler<LogSearchGetSampler.Inner> {
             this.template.insert(list, collection);
         };
 
-        new PageGroup<>(SamplerUtil.page(LogSearchGet.class), ps, consumer).execute();
+        List<GroupFail<LogSearchGet.Param>> fail = new PageGroup<>(SamplerUtil.page(LogSearchGet.class), ps, consumer).execute();
+        if (null != fail) {
+            return fail.stream().map(item -> {
+                LogSearchGet.Param param = item.getParam();
+                Inner inner = new Inner();
+                inner.setAdvertiserId(param.getAdvertiserId());
+                inner.setDay(day);
+                return new GroupFail<>(new Param<>(item.getContext(), inner), item.getError());
+            }).collect(Collectors.toList());
+        } {
+            return null;
+        }
     }
 
     @Data

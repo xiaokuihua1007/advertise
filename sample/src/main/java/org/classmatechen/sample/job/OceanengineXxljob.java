@@ -56,7 +56,7 @@ public class OceanengineXxljob {
     private AdvertiserGetApiSampler advertiserGetApiSampler;
 
     /**
-     * 每日基础数据拉取
+     * 拉取昨天全部基础数据
      */
     @XxlJob("oceanengineDay")
     public void oceanengineDay() {
@@ -522,10 +522,10 @@ public class OceanengineXxljob {
         final String startTime = start, endTime = end;
         XxlJobHelper.log("时间:" + startTime + " ~ " + endTime);
 
-        List<Param<ReportCustomGetGetSampler.SamplerParam>> params = getAdvertisers()
+        List<Param<ReportCustomGetGetSampler.Inner>> params = getAdvertisers()
             .stream()
             .map(advertiser -> {
-                ReportCustomGetGetSampler.SamplerParam param = new ReportCustomGetGetSampler.SamplerParam();
+                ReportCustomGetGetSampler.Inner param = new ReportCustomGetGetSampler.Inner();
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 param.setStartTime(startTime);
                 param.setEndTime(endTime);

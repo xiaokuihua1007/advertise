@@ -5,12 +5,16 @@ import java.util.stream.Collectors;
 
 import org.bson.Document;
 import org.classmatechen.basic.group.Consumer;
+import org.classmatechen.basic.group.GroupFail;
 import org.classmatechen.basic.group.Param;
 import org.classmatechen.basic.group.impl.PageGroup;
+import org.classmatechen.basic.pubsub.Publisher;
+import org.classmatechen.common.Platform;
 import org.classmatechen.oceanengine.request.FileImageGetGet;
+import org.classmatechen.sample.event.ImageSampledEvent;
 import org.classmatechen.sample.mongo.MongoRowBuilder;
 import org.classmatechen.sample.mongo.MongoStore;
-import org.classmatechen.sample.sample.Sampler;
+import org.classmatechen.sample.sample.AbstarctSampler;
 import org.classmatechen.sample.sample.SamplerUtil;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +22,12 @@ import com.bytedance.ads.model.FileImageGetV2ResponseDataListInner;
 import com.mongodb.client.model.UpdateOneModel;
 
 @Service
-public class FileImageGetGetSampler implements Sampler<FileImageGetGet.Param> {
+public class FileImageGetGetSampler extends AbstarctSampler<FileImageGetGet.Param> {
 
     public static final String collection = "Dy_FileImageGetGet";
 
     @Override
-    public void sample(List<Param<FileImageGetGet.Param>> params) {
+    public List<GroupFail<FileImageGetGet.Param>> doSample(List<Param<FileImageGetGet.Param>> params) {
         
         Consumer<FileImageGetGet.Param, List<FileImageGetV2ResponseDataListInner>> consumer = (context, param, list) -> {
             List<UpdateOneModel<Document>> documents = list
@@ -38,6 +42,12 @@ public class FileImageGetGetSampler implements Sampler<FileImageGetGet.Param> {
                 MongoStore.store(collection, documents);
         };
 
-        new PageGroup<>(SamplerUtil.page(FileImageGetGet.class), params, consumer).execute();
+        return new PageGroup<>(SamplerUtil.page(FileImageGetGet.class), params, consumer).execute();
+    }
+
+    @Override
+    protected void postProcess() {
+
+        Publisher.publish(new ImageSampledEvent(Platform.Oceanengine));
     }
 }

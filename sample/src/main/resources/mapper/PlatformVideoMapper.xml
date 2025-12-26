@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.classmatechen.sample.mapper.PlatformVideoMapper">
+
+    <update id="updatePath">
+        update platform_video set path = #{ path } and post_path = #{ postPath } where id = #{ id }
+    </update>
+
+    <select id="list">
+        select * from platform_video where 1 = 1
+        <if test="null != platform">
+            and platform = #{ platform }
+        </if>
+        <if test="null != pathExist and true == pathExist">
+            and path is not null
+        </if>
+        <if test="null != pathExist and false == pathExist">
+            and path is null
+        </if>
+    </select>
+</mapper>

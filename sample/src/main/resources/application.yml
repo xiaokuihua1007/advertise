@@ -3,11 +3,11 @@ spring:
     banner-mode: off
   profiles:
     active: dev
-  # redis:
-  #   host: redis-dev
-  #   port: 12021
-  #   database: 0
-  #   password: Redis@123!@#
+  redis:
+    host: redis-dev
+    port: 12021
+    database: 0
+    password: Redis@123!@#
   data:
     mongodb:
       host: localhost
