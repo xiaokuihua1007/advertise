@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.classmatechen.sample.mapper.TencentMapper">
 
-    <select id="select">
+    <select id="select" resultType="org.classmatechen.sample.po.Tencent">
         select client_id, client_secret, authorization_code, redirect_uri from tencent where client_id = #{ clientId }
     </select>
 
-    <select id="list">
+    <select id="list" resultType="org.classmatechen.sample.po.Tencent">
         select client_id, client_secret, authorization_code, redirect_uri from tencent
     </select>
 </mapper>

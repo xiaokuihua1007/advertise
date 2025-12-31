@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.classmatechen.basic.group.Param;
+import org.classmatechen.common.Platform;
 import org.classmatechen.oceanengine.DyContextImpl;
 import org.classmatechen.oceanengine.request.AdvertiserInfoGet;
 import org.classmatechen.oceanengine.request.AdvertiserListGet;
@@ -31,6 +32,7 @@ import org.classmatechen.sample.sample.oceanengine.ProjectListGetSampler;
 import org.classmatechen.sample.sample.oceanengine.PromotionListGetSampler;
 import org.classmatechen.sample.sample.oceanengine.ReportCustomConfigGetGetSampler;
 import org.classmatechen.sample.sample.oceanengine.ReportCustomGetGetSampler;
+import org.classmatechen.sample.service.PlatformImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -522,6 +524,14 @@ public class OceanengineXxljob {
             })
             .collect(Collectors.toList());
         reportCustomGetGetSampler.sample(params);
+    }
+
+    @Autowired
+    private PlatformImageService platformImageService;
+
+    @XxlJob("loadResource")
+    public void loadResource() {
+        platformImageService.loadResource(Platform.Oceanengine);
     }
     
     private List<DyAdvertiserID> getAdvertisers() {

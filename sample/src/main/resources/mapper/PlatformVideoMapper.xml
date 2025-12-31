@@ -6,7 +6,7 @@
         update platform_video set path = #{ path } and post_path = #{ postPath } where id = #{ id }
     </update>
 
-    <select id="list">
+    <select id="list" resultType="org.classmatechen.sample.po.PlatformVideo">
         select * from platform_video where 1 = 1
         <if test="null != platform">
             and platform = #{ platform }

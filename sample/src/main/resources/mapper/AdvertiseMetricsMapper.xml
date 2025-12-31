@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.classmatechen.sample.mapper.AdvertiseMetricsMapper">
 
-    <select id="list">
+    <select id="list" resultType="org.classmatechen.sample.po.AdvertiseMetrics">
         select * from oceanengine_advertise_metrics
     </select>
 

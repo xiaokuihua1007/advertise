@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.classmatechen.basic.Context;
 import org.classmatechen.basic.pubsub.AccessTokenExpiredListener;
+import org.classmatechen.basic.pubsub.AccessTokenRefreshedEvent;
 import org.classmatechen.basic.pubsub.AccessTokenRefreshedListener;
 import org.classmatechen.basic.pubsub.Publisher;
 import org.classmatechen.basic.pubsub.RefreshTokenRefreshedListener;
@@ -57,7 +58,11 @@ public class DyRedisAccessTokenProvider implements
         }
         Long id = map.get(oceanengine.getAppId());
         if (null != id) {
-            return this.redisTemplate.opsForValue().get(ACCESS_TOKEN + id);
+            String accessToken = this.redisTemplate.opsForValue().get(ACCESS_TOKEN + id);
+            if (null != accessToken) {
+                Publisher.publish(new AccessTokenRefreshedEvent(context, accessToken));
+                return accessToken;
+            }
         }
         return null;
     }

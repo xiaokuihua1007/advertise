@@ -6,7 +6,7 @@
         update platform_image set path = #{ path } where id = #{ id }
     </update>
 
-    <select id="list">
+    <select id="list" resultType="org.classmatechen.sample.po.PlatformImage">
         select * from platform_image where 1 = 1
         <if test="null != platform">
             and platform = #{ platform }
