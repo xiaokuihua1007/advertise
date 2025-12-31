@@ -9,6 +9,4 @@ public class Tencent {
     private String clientSecret;
     private String authorizationCode;
     private String redirectUri;
-    private String accessToken;
-    private String refreshToken;
 }

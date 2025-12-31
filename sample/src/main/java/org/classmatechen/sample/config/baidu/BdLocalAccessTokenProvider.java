@@ -9,9 +9,8 @@ import org.classmatechen.basic.pubsub.AccessTokenExpiredListener;
 import org.classmatechen.basic.pubsub.AccessTokenRefreshedListener;
 import org.classmatechen.basic.pubsub.Publisher;
 import org.classmatechen.baidu.client.impl.AccessTokenProvider;
-import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 public class BdLocalAccessTokenProvider implements
                                                 AccessTokenProvider,
                                                 AccessTokenExpiredListener,

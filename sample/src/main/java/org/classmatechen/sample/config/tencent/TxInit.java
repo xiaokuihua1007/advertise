@@ -8,9 +8,8 @@ import org.classmatechen.tencent.TencentInit;
 import org.classmatechen.tencent.client.impl.AccessTokenProvider;
 import org.classmatechen.tencent.client.impl.init.TencentProvider;
 import org.classmatechen.tencent.client.impl.refresh.RefreshTokenProvider;
-import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 public class TxInit {
 
     private List<AccessTokenProvider> providers0;

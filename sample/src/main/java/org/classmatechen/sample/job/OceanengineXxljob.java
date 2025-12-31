@@ -1,6 +1,5 @@
 package org.classmatechen.sample.job;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -88,11 +87,10 @@ public class OceanengineXxljob {
      */
     @XxlJob("advertiserGetApiSampler")
     public void advertiserGetApiSampler() {
-
         List<Oceanengine> oceanengines = this.oceanengineMapper.list();
         List<Param<String>> params = oceanengines
             .stream()
-            .map(oceanengine -> new Param<>(new DyContextImpl(oceanengine.getAppId()), oceanengine.getAccessToken()))
+            .map(oceanengine -> new Param<>(new DyContextImpl(oceanengine.getAppId()), "placeholder"))
             .collect(Collectors.toList());
         advertiserGetApiSampler.sample(params);
     }
@@ -194,6 +192,7 @@ public class OceanengineXxljob {
     @XxlJob("fileImageGetGetSamplerYesterday")
     public void fileImageGetGetSamplerYesterday() {
 
+        final String yesterday = new XxljobParam().getDateOrYesterday();
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<FileImageGetGet.Param>> params = advertisers
             .stream()
@@ -202,8 +201,8 @@ public class OceanengineXxljob {
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 param.setPageSize(20L);
                 FileImageGetV2Filtering filtering = new FileImageGetV2Filtering();
-                filtering.setStartTime(yesterday());
-                filtering.setEndTime(yesterday());
+                filtering.setStartTime(yesterday);
+                filtering.setEndTime(yesterday);
                 param.setFiltering(filtering);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
             })
@@ -239,6 +238,7 @@ public class OceanengineXxljob {
     @XxlJob("fileVideoGetGetSamplerYesterday")
     public void fileVideoGetGetSamplerYesterday() {
 
+        final String yesterday = new XxljobParam().getDateOrYesterday();
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<FileVideoGetGet.Param>> params = advertisers
             .stream()
@@ -247,8 +247,8 @@ public class OceanengineXxljob {
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 param.setPageSize(20L);
                 FileVideoGetV2Filtering filtering = new FileVideoGetV2Filtering();
-                filtering.setStartTime(yesterday());
-                filtering.setEndTime(yesterday());
+                filtering.setStartTime(yesterday);
+                filtering.setEndTime(yesterday);
                 param.setFiltering(filtering);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
             })
@@ -265,11 +265,7 @@ public class OceanengineXxljob {
     @XxlJob("logSearchGetSampler")
     public void logSearchGetSampler() {
 
-        String day = XxlJobHelper.getJobParam();
-        if (null == day || day.length() == 0) {
-            day = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
-        }
-        final String date = day;
+        final String date = new XxljobParam().getDateOrYesterday();
         XxlJobHelper.log("date:" + date);
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<LogSearchGetSampler.Inner>> params = advertisers
@@ -326,6 +322,7 @@ public class OceanengineXxljob {
     @XxlJob("projectListGetSamplerCreateYesterday")
     public void projectListGetSamplerCreateYesterday() {
 
+        String yesterday = new XxljobParam().getDateOrYesterday();
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<ProjectListGet.Param>> params = advertisers
             .stream()
@@ -334,7 +331,7 @@ public class OceanengineXxljob {
                 param.setPageSize(10L);
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 ProjectListV30Filtering filtering = new ProjectListV30Filtering();
-                filtering.setProjectCreateTime(yesterday());
+                filtering.setProjectCreateTime(yesterday);
                 param.setFiltering(filtering);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
             })
@@ -347,7 +344,7 @@ public class OceanengineXxljob {
                     param.setPageSize(10L);
                     param.setAdvertiserId(advertiser.getAdvertiserId());
                     ProjectListV30Filtering filtering = new ProjectListV30Filtering();
-                    filtering.setProjectCreateTime(yesterday());
+                    filtering.setProjectCreateTime(yesterday);
                     filtering.setStatusFirst(ProjectListV30FilteringStatusFirst.DELETE);
                     param.setFiltering(filtering);
                     return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
@@ -363,6 +360,7 @@ public class OceanengineXxljob {
     @XxlJob("projectListGetSamplerModifyYesterday")
     public void projectListGetSamplerModifyYesterday() {
 
+        String yesterday = new XxljobParam().getDateOrYesterday();
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<ProjectListGet.Param>> params = advertisers
             .stream()
@@ -371,7 +369,7 @@ public class OceanengineXxljob {
                 param.setPageSize(10L);
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 ProjectListV30Filtering filtering = new ProjectListV30Filtering();
-                filtering.setProjectModifyTime(yesterday());
+                filtering.setProjectModifyTime(yesterday);
                 param.setFiltering(filtering);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
             })
@@ -384,7 +382,7 @@ public class OceanengineXxljob {
                     param.setPageSize(10L);
                     param.setAdvertiserId(advertiser.getAdvertiserId());
                     ProjectListV30Filtering filtering = new ProjectListV30Filtering();
-                    filtering.setProjectModifyTime(yesterday());
+                    filtering.setProjectModifyTime(yesterday);
                     filtering.setStatusFirst(ProjectListV30FilteringStatusFirst.DELETE);
                     param.setFiltering(filtering);
                     return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
@@ -425,6 +423,7 @@ public class OceanengineXxljob {
     @XxlJob("promotionListGetSamplerCreateYesterday")
     public void promotionListGetSamplerCreateYesterday() {
 
+        String yesterday = new XxljobParam().getDateOrYesterday();
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<PromotionListGet.Param>> params = advertisers
             .stream()
@@ -433,7 +432,7 @@ public class OceanengineXxljob {
                 param.setPageSize(10L);
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 PromotionListV30Filtering filtering = new PromotionListV30Filtering();
-                filtering.setPromotionCreateTime(yesterday());
+                filtering.setPromotionCreateTime(yesterday);
                 filtering.setStatusFirst(PromotionListV30FilteringStatusFirst.ALL);
                 param.setFiltering(filtering);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
@@ -448,6 +447,7 @@ public class OceanengineXxljob {
     @XxlJob("promotionListGetSamplerModifyYesterday")
     public void promotionListGetSamplerModifyYesterday() {
 
+        String yesterday = new XxljobParam().getDateOrYesterday();
         List<DyAdvertiserID> advertisers = getAdvertisers();
         List<Param<PromotionListGet.Param>> params = advertisers
             .stream()
@@ -456,7 +456,7 @@ public class OceanengineXxljob {
                 param.setPageSize(10L);
                 param.setAdvertiserId(advertiser.getAdvertiserId());
                 PromotionListV30Filtering filtering = new PromotionListV30Filtering();
-                filtering.setPromotionModifyTime(yesterday());
+                filtering.setPromotionModifyTime(yesterday);
                 filtering.setStatusFirst(PromotionListV30FilteringStatusFirst.ALL);
                 param.setFiltering(filtering);
                 return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
@@ -505,21 +505,10 @@ public class OceanengineXxljob {
     @XxlJob("reportCustomGetGetSampler")
     public void reportCustomGetGetSampler() {
 
-        String range = XxlJobHelper.getJobParam();
-        String start = null, end = null;
-        if (null != range && range.length() > 0) {
-            String[] ranges = range.split("~");
-            if (ranges.length == 2) {
-                start = ranges[0];
-                end = ranges[1];
-            }
-        }
-        if (null == start || null == end) {
-            start = yesterdayStartTime();
-            end = yesterdayEndTime();
-        }
+        XxljobParam xParam = new XxljobParam();
+        final String startTime = xParam.getStartDateTimeOrYesterday();
+        final String endTime = xParam.getEndDateTimeOrYesterday();
 
-        final String startTime = start, endTime = end;
         XxlJobHelper.log("时间:" + startTime + " ~ " + endTime);
 
         List<Param<ReportCustomGetGetSampler.Inner>> params = getAdvertisers()
@@ -538,20 +527,5 @@ public class OceanengineXxljob {
     private List<DyAdvertiserID> getAdvertisers() {
 
         return MongoStore.list(DyAdvertiserID.class, AdvertiserListGetSampler.collection);
-    }
-
-    private String yesterday() {
-
-        return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
-    }
-
-    private String yesterdayStartTime() {
-
-        return yesterday() + " 00:00:00";
-    }
-
-    private String yesterdayEndTime() {
-
-        return yesterday() + " 23:59:59";
     }
 }

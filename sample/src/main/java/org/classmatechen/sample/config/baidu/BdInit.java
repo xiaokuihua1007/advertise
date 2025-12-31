@@ -8,9 +8,8 @@ import org.classmatechen.baidu.BaiduInit;
 import org.classmatechen.baidu.client.impl.AccessTokenProvider;
 import org.classmatechen.baidu.client.impl.init.BaiduProvider;
 import org.classmatechen.baidu.client.impl.refresh.RefreshTokenProvider;
-import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 public class BdInit {
 
     private List<AccessTokenProvider> providers0;
