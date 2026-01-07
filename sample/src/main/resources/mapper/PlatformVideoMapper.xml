@@ -3,7 +3,7 @@
 <mapper namespace="org.classmatechen.sample.mapper.PlatformVideoMapper">
 
     <update id="updatePath">
-        update platform_video set path = #{ path } and post_path = #{ postPath } where id = #{ id }
+        update platform_video set `path` = #{ path }, `post_path` = #{ postPath } where id = #{ id }
     </update>
 
     <select id="list" resultType="org.classmatechen.sample.po.PlatformVideo">
@@ -16,6 +16,9 @@
         </if>
         <if test="null != pathExist and false == pathExist">
             and path is null
+        </if>
+        <if test="null != page and null != limit">
+            limit #{ page }, #{ limit }
         </if>
     </select>
 </mapper>

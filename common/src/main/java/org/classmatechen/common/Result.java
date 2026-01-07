@@ -1,4 +1,4 @@
-package org.classmatechen.core.common;
+package org.classmatechen.common;
 
 import lombok.Getter;
 
@@ -17,11 +17,11 @@ public class Result<T> {
 
     public static Result<Void> ok() {
 
-        return new Result<>(200, null, null);
+        return new Result<>(200, "成功", null);
     }
 
     public static <T> Result<T> ok(T data) {
 
-        return new Result<>(200, null, data);
+        return new Result<>(200, "成功", data);
     }
 }

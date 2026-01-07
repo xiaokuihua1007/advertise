@@ -1,10 +1,10 @@
 package org.classmatechen.core.controller;
 
+import org.classmatechen.common.Result;
 import org.classmatechen.core.application.local.promotion.LocalPromotionAppService;
 import org.classmatechen.core.application.local.promotion.command.GeneratePromotionConfigCommand;
 import org.classmatechen.core.application.local.promotion.command.PublishPlatformPromotionCommand;
 import org.classmatechen.core.application.local.promotion.dto.PromotionConfigDTO;
-import org.classmatechen.core.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

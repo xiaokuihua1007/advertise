@@ -11,11 +11,13 @@ import org.classmatechen.common.Platform;
 import org.classmatechen.oceanengine.DyContextImpl;
 import org.classmatechen.oceanengine.request.AdvertiserInfoGet;
 import org.classmatechen.oceanengine.request.AdvertiserListGet;
+import org.classmatechen.oceanengine.request.DpaClueProductListGet;
 import org.classmatechen.oceanengine.request.FileImageGetGet;
 import org.classmatechen.oceanengine.request.FileVideoGetGet;
 import org.classmatechen.oceanengine.request.FundGetGet;
 import org.classmatechen.oceanengine.request.ProjectListGet;
 import org.classmatechen.oceanengine.request.PromotionListGet;
+import org.classmatechen.oceanengine.request.QwReportCustomConfigGetGet;
 import org.classmatechen.oceanengine.request.ReportCustomConfigGetGet;
 import org.classmatechen.sample.entity.DyAdvertiserID;
 import org.classmatechen.sample.mapper.OceanengineMapper;
@@ -24,24 +26,30 @@ import org.classmatechen.sample.po.Oceanengine;
 import org.classmatechen.sample.sample.oceanengine.AdvertiserGetApiSampler;
 import org.classmatechen.sample.sample.oceanengine.AdvertiserInfoGetSampler;
 import org.classmatechen.sample.sample.oceanengine.AdvertiserListGetSampler;
+import org.classmatechen.sample.sample.oceanengine.DpaClueProductListGetSampler;
 import org.classmatechen.sample.sample.oceanengine.FileImageGetGetSampler;
 import org.classmatechen.sample.sample.oceanengine.FileVideoGetGetSampler;
 import org.classmatechen.sample.sample.oceanengine.FundGetGetSampler;
 import org.classmatechen.sample.sample.oceanengine.LogSearchGetSampler;
 import org.classmatechen.sample.sample.oceanengine.ProjectListGetSampler;
 import org.classmatechen.sample.sample.oceanengine.PromotionListGetSampler;
+import org.classmatechen.sample.sample.oceanengine.QwReportCustomConfigGetGetSampler;
 import org.classmatechen.sample.sample.oceanengine.ReportCustomConfigGetGetSampler;
 import org.classmatechen.sample.sample.oceanengine.ReportCustomGetGetSampler;
 import org.classmatechen.sample.service.PlatformImageService;
+import org.classmatechen.sample.service.PlatformVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.bytedance.ads.model.DpaClueProductListV2Filtering;
+import com.bytedance.ads.model.DpaClueProductListV2FilteringRels;
 import com.bytedance.ads.model.FileImageGetV2Filtering;
 import com.bytedance.ads.model.FileVideoGetV2Filtering;
 import com.bytedance.ads.model.ProjectListV30Filtering;
 import com.bytedance.ads.model.ProjectListV30FilteringStatusFirst;
 import com.bytedance.ads.model.PromotionListV30Filtering;
 import com.bytedance.ads.model.PromotionListV30FilteringStatusFirst;
+import com.bytedance.ads.model.QianchuanReportCustomConfigGetV10DataTopics;
 import com.bytedance.ads.model.ReportCustomConfigGetV30DataTopics;
 import com.google.common.collect.Lists;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -499,6 +507,36 @@ public class OceanengineXxljob {
     }
 
     @Autowired
+    private QwReportCustomConfigGetGetSampler qwReportCustomConfigGetGetSampler;
+
+    /**
+     * 查询指标配置 Delete And Insert
+     */
+    @XxlJob("qwReportCustomConfigGetGetSampler")
+    public void qwReportCustomConfigGetGetSampler() {
+
+        DyAdvertiserID advertiser = getAdvertisers().get(0);
+        QwReportCustomConfigGetGet.Param p = new QwReportCustomConfigGetGet.Param();
+        p.setAdvertiserId(advertiser.getAdvertiserId());
+        p.setDataTopics(Arrays.asList(
+            QianchuanReportCustomConfigGetV10DataTopics.ECP_BASIC_DATA,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_POST_DATA_LIVE,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_POST_DATA_OTHER,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_POST_DATA_TITLE,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_POST_DATA_VIDEO,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_PRODUCT_POST_DATA_IMAGE,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_PRODUCT_POST_DATA_OTHER,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_PRODUCT_POST_DATA_TITLE,
+            QianchuanReportCustomConfigGetV10DataTopics.SITE_PROMOTION_PRODUCT_POST_DATA_VIDEO
+        ));
+        Param<QwReportCustomConfigGetGet.Param> param = new Param<>(
+            new DyContextImpl(advertiser.getAppId()),
+            p
+        );
+        qwReportCustomConfigGetGetSampler.sample(param);
+    }
+
+    @Autowired
     private ReportCustomGetGetSampler reportCustomGetGetSampler;
 
     /**
@@ -532,6 +570,39 @@ public class OceanengineXxljob {
     @XxlJob("loadResource")
     public void loadResource() {
         platformImageService.loadResource(Platform.Oceanengine);
+    }
+
+    @Autowired
+    private PlatformVideoService platformVideoService;
+
+    @XxlJob("loadVideoResource")
+    public void loadVideoResource() {
+        platformVideoService.loadResource(Platform.Oceanengine);
+    }
+
+    @Autowired
+    private DpaClueProductListGetSampler dpaClueProductListGetSampler;
+
+    /**
+     * 拉取所有商品 UpSert
+     */
+    @XxlJob("dpaClueProductListGetSampler")
+    public void dpaClueProductListGetSampler() {
+
+        List<DyAdvertiserID> advertisers = getAdvertisers();
+        List<Param<DpaClueProductListGet.Param>> params = advertisers
+            .stream()
+            .map(advertiser -> {
+                DpaClueProductListGet.Param param = new DpaClueProductListGet.Param();
+                param.setAdvertiserId(advertiser.getAdvertiserId());
+                DpaClueProductListV2Filtering filtering = new DpaClueProductListV2Filtering();
+                filtering.setRels(Arrays.asList(DpaClueProductListV2FilteringRels.OWN));
+                param.setFiltering(filtering);
+                param.setPageSize(50L);
+                return new Param<>(new DyContextImpl(advertiser.getAppId()), param);
+            })
+            .collect(Collectors.toList());
+        dpaClueProductListGetSampler.sample(params);
     }
     
     private List<DyAdvertiserID> getAdvertisers() {

@@ -51,7 +51,7 @@ public class LocalFileService implements FileService {
 
             List<Integer> list = Arrays.asList(files).stream().map(i -> Integer.parseInt(i.getName())).sorted().collect(Collectors.toList());
             Map<Integer, File> fileMap = Arrays.asList(files).stream().collect(Collectors.toMap(i -> Integer.parseInt(i.getName()), i -> i));
-            if (fileMap.get(list.get(list.size() - 1)).listFiles().length < 2) {
+            if (fileMap.get(list.get(list.size() - 1)).listFiles().length < 1000) {
                 second = fileMap.get(list.get(list.size() - 1)).getName();
             }
         }

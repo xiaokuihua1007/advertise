@@ -8,10 +8,11 @@ public class PlatformImage {
     private Long id;
     private String platformId;
     private Integer platform;
-    private String filename;
+    private String name;
     private String url;
     /**
      * 本地路径
      */
     private String path;
+    private Long accountId;
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.classmatechen.basic.pubsub.Publisher;
 import org.classmatechen.common.Platform;
 import org.classmatechen.sample.event.ImageSampledEvent;
+import org.classmatechen.sample.event.ImageSampledFailEvent;
 import org.classmatechen.sample.event.ImageSampledListener;
 import org.classmatechen.sample.mapper.PlatformImageMapper;
 import org.classmatechen.sample.po.PlatformImage;
@@ -57,12 +58,17 @@ public class PlatformImageService implements ImageSampledListener {
                 list = mapper.list(query);
             }
         }
+
+        list = mapper.list(query);
+        if (list.size() > 0) {
+            Publisher.publish(new ImageSampledFailEvent(Platform.Oceanengine, list));
+        }
     }
 
     private void download(PlatformImage image) throws Exception {
         
         String url = image.getUrl();
-        String filename = image.getFilename();
+        String filename = image.getName();
         if (null == url || null == filename) {
             return;
         }

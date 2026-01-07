@@ -5,6 +5,7 @@ import java.util.List;
 import org.classmatechen.basic.pubsub.Publisher;
 import org.classmatechen.common.Platform;
 import org.classmatechen.sample.event.VideoSampledEvent;
+import org.classmatechen.sample.event.VideoSampledFailEvent;
 import org.classmatechen.sample.event.VideoSampledListener;
 import org.classmatechen.sample.mapper.PlatformVideoMapper;
 import org.classmatechen.sample.po.PlatformVideo;
@@ -58,12 +59,17 @@ public class PlatformVideoService implements VideoSampledListener {
                 list = mapper.list(query);
             }
         }
+
+        list = mapper.list(query);
+        if (list.size() > 0) {
+            Publisher.publish(new VideoSampledFailEvent(Platform.Oceanengine, list));
+        }
     }
 
     private void download(PlatformVideo video) throws Exception {
         
         String url = video.getUrl();
-        String filename = video.getFilename();
+        String filename = video.getName();
         if (null == url || null == filename) {
             return;
         }

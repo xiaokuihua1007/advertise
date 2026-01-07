@@ -7,7 +7,7 @@ public class PlatformVideo {
 
     private Long id;
     private String platformId;
-    private String filename;
+    private String name;
     private Integer platform;
     private String url;
     /**
@@ -19,4 +19,5 @@ public class PlatformVideo {
      * 本地封面路径
      */
     private String postPath;
+    private Long accountId;
 }
