@@ -9,8 +9,9 @@ import org.classmatechen.basic.pubsub.AccessTokenRefreshedListener;
 import org.classmatechen.basic.pubsub.Publisher;
 import org.classmatechen.tencent.TxContext;
 import org.classmatechen.tencent.client.impl.AccessTokenProvider;
+import org.springframework.stereotype.Component;
 
-// @Component
+@Component
 public class TxLocalAccessTokenProvider implements
                                                 AccessTokenProvider,
                                                 AccessTokenExpiredListener,

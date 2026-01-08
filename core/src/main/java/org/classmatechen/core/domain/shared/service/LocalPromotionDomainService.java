@@ -30,7 +30,7 @@ public class LocalPromotionDomainService {
     @Transactional(rollbackFor = Exception.class)
     public void publishPlatformPromotion(Account account, LocalPromotion localPromotion, PromotionConfig config) {
 
-        if (!account.isNormal() || localPromotion.createdWithPlatform(account.platform())) {
+        if (!account.isNormal() || localPromotion.hasCreatedWithPlatform(account.platform())) {
             throw new RuntimeException();
         }
 

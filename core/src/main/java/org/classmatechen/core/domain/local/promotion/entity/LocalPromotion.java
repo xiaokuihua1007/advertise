@@ -21,31 +21,58 @@ import lombok.Getter;
 public class LocalPromotion {
 
     @Getter
-    private final LocalPromotionId id;
-    private final Map<Platform, PromotionRef> promotions;
-    private final LocalPromotionConfig config;
+    private LocalPromotionId id;
+    private Map<Platform, PromotionRef> promotions;
+    private LocalPromotionConfig config;
 
-    public LocalPromotion(
-        Long id,
-        Map<Platform, PromotionRef> promotions,
-        LocalPromotionConfig config
-    ) {
-        this.id = new LocalPromotionId(id);
-        this.promotions = Objects.isNull(promotions) ? new HashMap<>() : promotions;
-        if (Objects.isNull(config)) {
+    private LocalPromotion() { }
+
+    private void setId(LocalPromotionId id) {
+        if (null == id) {
+            throw new IllegalArgumentException();
+        }
+        this.id = id;
+    }
+
+    private void setConfig(LocalPromotionConfig config) {
+        if (null == config) {
             throw new IllegalArgumentException();
         }
         this.config = config;
     }
 
-    public boolean createdWithPlatform(Platform platform) {
+    private void setPromotions(Map<Platform, PromotionRef> promotions) {
+        this.promotions = null == promotions ? new HashMap<>() : promotions;
+    }
+
+    public static LocalPromotion factory(
+        LocalPromotionId id,
+        LocalPromotionConfig config
+    ) {
+        return factory(id, null, config);
+    }
+
+    public static LocalPromotion factory(
+        LocalPromotionId id,
+        Map<Platform, PromotionRef> promotions,
+        LocalPromotionConfig config
+    ) {
+
+        LocalPromotion promotion = new LocalPromotion();
+        promotion.setId(id);
+        promotion.setPromotions(promotions);
+        promotion.setConfig(config);
+        return promotion;
+    }
+
+    public boolean hasCreatedWithPlatform(Platform platform) {
 
         return this.promotions.containsKey(platform);
     }
 
     public void addPromotion(Platform platform, PromotionId promotionId) {
 
-        if (createdWithPlatform(platform)) {
+        if (hasCreatedWithPlatform(platform)) {
             throw new RuntimeException();
         }
         this.promotions.put(platform, new PromotionRef(promotionId, platform));
