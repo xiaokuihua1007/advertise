@@ -10,7 +10,5 @@ public interface AccountRepository {
 
     Account findById(AccountId id);
 
-    void save(Account account);
-
     List<Account> list(AccountQuery query);
 }

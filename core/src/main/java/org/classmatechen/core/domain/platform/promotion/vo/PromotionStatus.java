@@ -1,16 +1,20 @@
 package org.classmatechen.core.domain.platform.promotion.vo;
 
-public enum PromotionStatus {
+import org.classmatechen.core.common.CEnum;
 
-    Noraml(0, "Normal"), // 正常状态
-    Nuknown(1, "Nuknown"),
-    ;
+public class PromotionStatus extends CEnum {
 
-    private final int code;
-    private final String lable;
+    /**
+     * 正常
+     */
+    public static final PromotionStatus running = new PromotionStatus(0, "running");
+
+    /**
+     * 禁用
+     */
+    public static final PromotionStatus disable = new PromotionStatus(2, "disable");
 
     private PromotionStatus(int code, String lable) {
-        this.code = code;
-        this.lable = lable;
+        super(code, lable);
     }
 }

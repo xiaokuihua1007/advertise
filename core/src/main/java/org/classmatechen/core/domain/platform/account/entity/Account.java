@@ -2,18 +2,24 @@ package org.classmatechen.core.domain.platform.account.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.classmatechen.common.Platform;
-import org.classmatechen.core.domain.platform.account.error.PromotionAddNotAllow;
+import org.classmatechen.core.domain.local.promotion.vo.LocalPromotionId;
 import org.classmatechen.core.domain.platform.account.vo.AccountId;
 import org.classmatechen.core.domain.platform.account.vo.AccountStatus;
+import org.classmatechen.core.domain.platform.promotion.entity.Promotion;
 import org.classmatechen.core.domain.platform.promotion.vo.PromotionId;
 
+/**
+ * 账户
+ * 只读
+ * 只能在广告平台创建
+ */
 public class Account {
 
     private AccountId id;
+    private Platform platform;
     private String name;
     private String tokenId;
     private AccountStatus status;
@@ -22,104 +28,26 @@ public class Account {
     private Long staffId;
     private List<PromotionId> promotionIds;
 
-    private Account() { }
-
-    public static Account factory(
-        AccountId id,
-        String name,
-        String tokenId,
-        AccountStatus status,
-        BigDecimal balance,
-        LocalDateTime createTime,
-        Long staffId,
-        List<PromotionId> promotionIds
-    ) {
-
-        Account account = new Account();
-        account.setId(id);
-        account.setName(name);
-        account.setTokenId(tokenId);
-        account.setStatus(status);
-        account.setBalance(balance);
-        account.setCreateTime(createTime);
-        account.setStaffId(staffId);
-        account.setPromotionIds(promotionIds);
-        return account;
-    }
-
-    private void setId(AccountId id) {
-        if (null == id) {
-            throw new IllegalArgumentException();
-        }
-        this.id = id;
-    }
-
-    private void setName(String name) {
-        if (null == name || name.length() == 0) {
-            throw new IllegalArgumentException();
-        }
-        this.name = name;
-    }
-
-    private void setTokenId(String tokenId) {
-        if (null == tokenId || tokenId.length() == 0) {
-            throw new IllegalArgumentException();
-        }
-        this.tokenId = tokenId;
-    }
-
-    private void setStatus(AccountStatus status) {
-        if (null == status) {
-            throw new IllegalArgumentException();
-        }
-        this.status = status;
-    }
-
-    private void setBalance(BigDecimal balance) {
-        if (null == balance) {
-            this.balance = BigDecimal.ZERO;
-        } else {
-            this.balance = balance;
-        }
-    }
-
-    private void setCreateTime(LocalDateTime createTime) {
-        if (null == createTime) {
-            throw new IllegalArgumentException();
-        }
-        this.createTime = createTime;
-    }
-
-    private void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    private void setPromotionIds(List<PromotionId> promotionIds) {
-        if (null == promotionIds) {
-            this.promotionIds = new ArrayList<>();
-        } else {
-            this.promotionIds = promotionIds;
-        }
+    public boolean isRunning() {
+        return AccountStatus.RUNNING == this.status;
     }
 
     public Platform platform() {
-        return this.id.platform();
+        return this.platform;
     }
 
-    public String tokenId() {
-        return this.tokenId;
-    }
+    /**
+     * 创建推广
+     * @param promotionId
+     * @param localPromotionId
+     * @return
+     */
+    public Promotion createPromotion(Long promotionId, LocalPromotionId localPromotionId) {
 
-    public boolean isNormal() {
-
-        return this.status == AccountStatus.Noraml;
-    }
-
-    public void addPromotion(PromotionId promotionId) {
-
-        if (!isNormal()) {
-            throw new PromotionAddNotAllow();
+        if (isRunning()) {
+            this.promotionIds.add(new PromotionId(promotionId, platform));
         }
-        this.promotionIds.add(promotionId);
+        Promotion promotion = new Promotion();
+        return promotion;
     }
 }

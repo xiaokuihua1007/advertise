@@ -1,15 +1,20 @@
 package org.classmatechen.core.domain.platform.account.vo;
 
-public enum AccountStatus {
+import org.classmatechen.core.common.CEnum;
 
-    Noraml(0, "Normal"), // 正常状态
-    ;
+public class AccountStatus extends CEnum {
 
-    private final int code;
-    private final String lable;
+    /**
+     * 正常
+     */
+    public static final AccountStatus RUNNING = new AccountStatus(0, "RUNNING");
+
+    /**
+     * 禁用
+     */
+    public static final AccountStatus DISABLE = new AccountStatus(2, "DISABLE");
 
     private AccountStatus(int code, String lable) {
-        this.code = code;
-        this.lable = lable;
+        super(code, lable);
     }
 }

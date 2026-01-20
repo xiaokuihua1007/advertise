@@ -1,10 +1,11 @@
 package org.classmatechen.core.domain.local.promotion.vo;
 
-public record LocalPromotionId(Long id) {
+public record LocalPromotionId(Long localPromotionId) {
 
     public LocalPromotionId {
-        if (null == id || id <= 0) {
-            throw new IllegalArgumentException("Long localPromotionId cannot be null when new LocalPromotionId()");
+
+        if (null == localPromotionId || localPromotionId <= 0) {
+            throw new IllegalArgumentException();
         }
     }
 }
